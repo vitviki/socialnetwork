@@ -17,7 +17,7 @@ class Profile(models.Model):
     location = models.CharField(max_length=100, blank=True)
 
     def __str__(self):
-        return f"self.user.username"
+        return f"{self.user.username}"
 
     def get_profile_image(self):
         return 'http://127.0.0.1:8000' + self.profile_img_raw.url
@@ -26,6 +26,7 @@ class Profile(models.Model):
         # Process image to make thumbnail
         if not self.profile_img_thumbnail:
             self.profile_img_thumbnail = self.make_thumbnail(self.profile_img_raw)
+            self.save()
 
         return 'http://127.0.0.1:8000' + self.profile_img_thumbnail.url
 
