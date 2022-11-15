@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from django.contrib.auth.models import User, auth
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
 from django.contrib import messages
 
 from .models import Profile
@@ -32,10 +33,25 @@ def signup(request):
                 user_profile = Profile.objects.create(user=user, id_user=user.id, location=location)
                 user_profile.save()
                 
-                return redirect('signup')
+                return redirect('signin')
         else:
-            print("password missmatch")
             messages.info(request, 'Password mismatch. Please try again')
             return redirect('signup')
 
     return render(request, 'signup.html')
+
+def signin(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+
+        user = authenticate(username=username, password=password)
+    
+        if user is not None:
+            login(request, user)
+            return redirect('/')
+        else:
+            messages.info(request, 'Username or Password is incorrect. Please try again')
+            return redirect('signin')
+        
+    return render(request, 'signin.html')
