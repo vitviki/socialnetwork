@@ -64,3 +64,39 @@ def signout(request):
 
     return redirect('signin')
 
+@login_required(login_url='signin')
+def settings(request):
+
+    # Retrieve the user
+    user_profile = Profile.objects.get(user=request.user)
+    user = User.objects.get(username=request.user.username)
+    if request.method == 'POST':
+        if request.FILES.get('image') != None:
+            image = request.FILES.get('image')
+        else:
+            image = user_profile.profile_img_raw
+        
+        first_name = request.POST['first_name']
+        last_name = request.POST['last_name']
+        bio = request.POST['bio']
+        email = request.POST['email']
+        location = request.POST['location']
+
+        user.first_name = first_name
+        user.last_name = last_name
+        user.email = email
+        user_profile.profile_img_raw = image
+        user_profile.bio = bio
+        user_profile.location = location
+        user_profile.process_thumbnail()
+        user_profile.save()
+        user.save()
+
+        return redirect('settings')
+
+    context = {
+        'profile': user_profile
+    }
+
+    return render(request, 'setting.html', context)
+
